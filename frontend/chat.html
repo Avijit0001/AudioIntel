@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Audio Intel — Recommendations</title>
+    <meta name="description" content="Chat with Audio Intel AI for personalized headphone recommendations." />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="chat.css" />
+</head>
+
+<body>
+    <div class="bg-glow">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">🎧</div><span>Audio Intel</span>
+        </a>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a><a href="login.html">Login</a>
+            <a href="chat.html" class="active">Recommend</a><a href="about.html">About</a>
+        </div>
+    </nav>
+
+    <main class="chat-layout">
+        <!-- Left Sidebar: Filters -->
+        <aside class="sidebar-left">
+            <div class="sidebar-title">🔍 Filters</div>
+
+            <!-- Type Filter -->
+            <div class="filter-group">
+                <label>Product Type</label>
+                <div class="type-chips" id="typeChips">
+                    <button class="type-chip active" data-type="all">All</button>
+                    <button class="type-chip" data-type="headphone">🎧 Headphone</button>
+                    <button class="type-chip" data-type="tws">🎵 TWS</button>
+                    <button class="type-chip" data-type="neckband">🔗 Neckband</button>
+                    <button class="type-chip" data-type="earphone">🎶 Earphone</button>
+                </div>
+            </div>
+
+            <!-- Connectivity: Wired / Wireless -->
+            <div class="filter-group">
+                <label>Connectivity</label>
+                <div class="type-chips" id="connectChips">
+                    <button class="type-chip active" data-connect="all">All</button>
+                    <button class="type-chip" data-connect="wired">🔌 Wired</button>
+                    <button class="type-chip" data-connect="wireless">📶 Wireless</button>
+                </div>
+            </div>
+
+            <!-- Budget Slider -->
+            <div class="filter-group">
+                <label>Budget Range</label>
+                <div class="budget-slider-container">
+                    <input type="range" id="budgetSlider" class="budget-slider" min="0" max="500" value="500" step="10"
+                        oninput="updateBudget(this.value)" />
+                    <div class="budget-labels">
+                        <span>$0</span>
+                        <span class="budget-value" id="budgetValue">$500</span>
+                        <span>$500+</span>
+                    </div>
+                    <div class="budget-display" id="budgetDisplay">Up to <strong>$500+</strong></div>
+                </div>
+            </div>
+
+            <!-- Use Case -->
+            <div class="filter-group">
+                <label>Use Case</label>
+                <select class="filter-select" id="useCaseFilter">
+                    <option value="general">General</option>
+                    <option value="music">🎵 Music</option>
+                    <option value="gaming">🎮 Gaming</option>
+                    <option value="travel">✈️ Travel</option>
+                    <option value="studio">🎚️ Studio</option>
+                </select>
+            </div>
+
+            <!-- Brand -->
+            <div class="filter-group">
+                <label>Brand</label>
+                <select class="filter-select" id="brandFilter">
+                    <option value="all">All Brands</option>
+                    <option>Sony</option>
+                    <option>Apple</option>
+                    <option>Bose</option>
+                    <option>Samsung</option>
+                    <option>Sennheiser</option>
+                    <option>JBL</option>
+                    <option>Jabra</option>
+                    <option>Nothing</option>
+                </select>
+            </div>
+
+            <button class="apply-btn btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            <button class="reset-btn" onclick="resetFilters()">↺ Reset All</button>
+        </aside>
+
+        <!-- Chat Center -->
+        <section class="chat-center">
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-welcome" id="chatWelcome">
+                    <div class="emoji">🎧</div>
+                    <h2>What headphones are you <span class="text-gradient">looking for?</span></h2>
+                    <p>Tell me your preferences and I'll recommend the perfect pair for you.</p>
+                    <div class="quick-prompts">
+                        <button class="quick-prompt" onclick="sendQuick(this.textContent)">Best for bass-heavy
+                            music</button>
+                        <button class="quick-prompt" onclick="sendQuick(this.textContent)">Under $100 wireless</button>
+                        <button class="quick-prompt" onclick="sendQuick(this.textContent)">Noise canceling for
+                            travel</button>
+                        <button class="quick-prompt" onclick="sendQuick(this.textContent)">Gaming headset + mic</button>
+                        <button class="quick-prompt" onclick="sendQuick(this.textContent)">Best neckband
+                            earphones</button>
+                        <button class="quick-prompt" onclick="sendQuick(this.textContent)">TWS for workouts</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-bar">
+                <div class="input-wrapper">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Describe your ideal headphones..."
+                        onkeydown="if(event.key==='Enter')sendMessage()" />
+                    <button class="send-btn" onclick="sendMessage()" aria-label="Send">➤</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Pane: Embedded Browser -->
+        <aside class="browser-pane">
+            <div class="browser-toolbar">
+                <div class="browser-nav">
+                    <button class="browser-btn" onclick="browserBack()" title="Back">←</button>
+                    <button class="browser-btn" onclick="browserForward()" title="Forward">→</button>
+                    <button class="browser-btn" onclick="browserReload()" title="Reload">⟳</button>
+                </div>
+                <div class="browser-address">
+                    <span class="browser-icon">🌐</span>
+                    <input type="text" class="browser-url" id="browserUrl"
+                        placeholder="Click a product link in chat to open it here..."
+                        onkeydown="if(event.key==='Enter')navigateBrowser(this.value)" />
+                </div>
+            </div>
+            <div class="browser-viewport" id="browserViewport">
+                <div class="browser-welcome" id="browserWelcome">
+                    <div class="bw-icon">🌐</div>
+                    <h3>Embedded Browser</h3>
+                    <p>When a product link appears in the chat, click it to view the product page right here.</p>
+                </div>
+                <iframe id="browserFrame" class="browser-frame"
+                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms" style="display:none;"></iframe>
+            </div>
+        </aside>
+    </main>
+
+    <script src="chat.js"></script>
+</body>
+
+</html>

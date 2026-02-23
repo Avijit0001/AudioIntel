@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Audio Intel — About Us</title>
+    <meta name="description"
+        content="Learn about Audio Intel's mission to help everyone find their perfect headphones through AI-powered recommendations." />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        .about-hero {
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 160px 24px 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-hero h1 {
+            font-size: 3.4rem;
+            margin-bottom: 16px;
+            animation: fadeInUp .8s ease-out;
+        }
+
+        .about-hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto;
+            animation: fadeInUp .8s ease-out .15s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* Mission */
+        .mission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .mission-card {
+            padding: 32px 24px;
+            border-radius: var(--radius);
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .mission-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-light);
+            box-shadow: 0 8px 32px var(--primary-glow);
+        }
+
+        .mission-card .m-icon {
+            font-size: 2.6rem;
+            margin-bottom: 16px;
+        }
+
+        .mission-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+        }
+
+        .mission-card p {
+            color: var(--text-secondary);
+            font-size: .92rem;
+        }
+
+        /* Story */
+        .story-section {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .story-section p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        /* Team */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .team-card {
+            padding: 32px 20px;
+            border-radius: var(--radius);
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .team-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
+
+        .team-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+        }
+
+        .team-avatar.a1 {
+            background: linear-gradient(135deg, var(--primary), var(--accent-dark));
+        }
+
+        .team-avatar.a2 {
+            background: linear-gradient(135deg, var(--accent), #0891b2);
+        }
+
+        .team-avatar.a3 {
+            background: linear-gradient(135deg, var(--warm), #d97706);
+        }
+
+        .team-avatar.a4 {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+        }
+
+        .team-card h4 {
+            font-size: 1.05rem;
+            margin-bottom: 4px;
+        }
+
+        .team-card .role {
+            color: var(--primary-light);
+            font-size: .85rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .team-card p {
+            color: var(--text-muted);
+            font-size: .82rem;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: .9rem;
+            margin-top: 4px;
+        }
+
+        /* Tech Stack */
+        .tech-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .tech-chip {
+            padding: 12px 24px;
+            border-radius: 40px;
+            border: 1px solid var(--glass-border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: .9rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .tech-chip:hover {
+            border-color: var(--primary);
+            color: var(--text);
+            background: rgba(124, 58, 237, .1);
+            transform: translateY(-2px);
+        }
+
+        /* Contact CTA */
+        .contact-box {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 48px 36px;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(124, 58, 237, .15), rgba(6, 182, 212, .1));
+            border: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .contact-box h2 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .contact-box p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        @media(max-width:768px) {
+            .about-hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .stats-row {
+                gap: 28px;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-glow">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">🎧</div><span>Audio Intel</span>
+        </a>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a><a href="login.html">Login</a>
+            <a href="chat.html">Recommend</a><a href="about.html" class="active">About</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="about-hero">
+        <h1>About <span class="text-gradient">Audio Intel</span></h1>
+        <p>We're on a mission to help everyone find their perfect headphones through intelligent, personalized
+            recommendations powered by deep audio expertise.</p>
+    </section>
+
+    <!-- Mission -->
+    <section class="section">
+        <h2 class="section-title fade-up">Our <span class="gradient">Mission</span></h2>
+        <p class="section-subtitle fade-up delay-1">We believe everyone deserves great sound that fits their life.</p>
+        <div class="mission-grid">
+            <div class="mission-card fade-up delay-1">
+                <div class="m-icon">🎯</div>
+                <h3>Personalized</h3>
+                <p>No two listeners are the same. Our AI learns your unique preferences to deliver tailored
+                    recommendations.</p>
+            </div>
+            <div class="mission-card fade-up delay-2">
+                <div class="m-icon">🔬</div>
+                <h3>Research-Backed</h3>
+                <p>Every recommendation is based on real acoustic data, expert reviews, and thousands of user
+                    experiences.</p>
+            </div>
+            <div class="mission-card fade-up delay-3">
+                <div class="m-icon">💡</div>
+                <h3>Unbiased</h3>
+                <p>We don't sell headphones. Our only goal is to help you find the best match without any brand bias.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Story -->
+    <section class="section">
+        <h2 class="section-title fade-up">Our <span class="gradient">Story</span></h2>
+        <div class="story-section fade-up delay-1">
+            <p>Audio Intel was born from a simple frustration: finding the right headphones shouldn't require hours of
+                research across dozens of review sites. We were a group of audiophiles and tech enthusiasts who spent
+                countless hours comparing specs, reading reviews, and testing headphones.</p>
+            <p>We realized that what most people need isn't another review site — it's a smart assistant that
+                understands their needs and gives the perfect recommendation in seconds. That's why we built Audio
+                Intel:
+                an AI-powered headphone recommendation engine that combines deep audio knowledge with cutting-edge
+                technology.</p>
+            <p>Today, Audio Intel has helped thousands of people discover headphones they love, from casual listeners to
+                professional musicians.</p>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="section">
+        <h2 class="section-title fade-up">By the <span class="gradient">Numbers</span></h2>
+        <p class="section-subtitle fade-up delay-1">Growing every day with our community of audio enthusiasts</p>
+        <div class="stats-row fade-up delay-2">
+            <div class="stat-item">
+                <div class="stat-number">50K+</div>
+                <div class="stat-label">Happy Users</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">2,500+</div>
+                <div class="stat-label">Headphones Analyzed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">98%</div>
+                <div class="stat-label">Satisfaction Rate</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">150+</div>
+                <div class="stat-label">Brands Covered</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team -->
+    <section class="section">
+        <h2 class="section-title fade-up">Meet the <span class="gradient">Team</span></h2>
+        <p class="section-subtitle fade-up delay-1">Passionate audiophiles and engineers behind Audio Intel</p>
+        <div class="team-grid">
+            <div class="team-card fade-up delay-1">
+                <div class="team-avatar a1">👨‍💻</div>
+                <h4>Alex Chen</h4>
+                <div class="role">Founder & CEO</div>
+                <p>Audiophile with 15+ years in audio engineering</p>
+            </div>
+            <div class="team-card fade-up delay-2">
+                <div class="team-avatar a2">👩‍🔬</div>
+                <h4>Sarah Kim</h4>
+                <div class="role">Head of AI</div>
+                <p>ML expert building recommendation algorithms</p>
+            </div>
+            <div class="team-card fade-up delay-3">
+                <div class="team-avatar a3">👨‍🎨</div>
+                <h4>Marcus Rivera</h4>
+                <div class="role">Lead Designer</div>
+                <p>UX designer creating intuitive audio experiences</p>
+            </div>
+            <div class="team-card fade-up delay-4">
+                <div class="team-avatar a4">👩‍🎧</div>
+                <h4>Yuki Tanaka</h4>
+                <div class="role">Audio Specialist</div>
+                <p>Professional sound engineer and reviewer</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech -->
+    <section class="section">
+        <h2 class="section-title fade-up">Our <span class="gradient">Technology</span></h2>
+        <p class="section-subtitle fade-up delay-1">Built with modern tools for the best experience</p>
+        <div class="tech-grid fade-up delay-2">
+            <div class="tech-chip">🤖 Machine Learning</div>
+            <div class="tech-chip">📊 Acoustic Analysis</div>
+            <div class="tech-chip">💬 Natural Language AI</div>
+            <div class="tech-chip">🔍 Smart Filtering</div>
+            <div class="tech-chip">📱 Responsive Design</div>
+            <div class="tech-chip">⚡ Real-Time Data</div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section">
+        <div class="contact-box fade-up">
+            <h2>Get in <span class="text-gradient">Touch</span></h2>
+            <p>Have questions, feedback, or partnership inquiries? We'd love to hear from you.</p>
+            <div class="contact-links">
+                <a href="mailto:hello@audioitel.com" class="btn btn-primary">📧 Email Us</a>
+                <a href="chat.html" class="btn btn-outline">💬 Chat Now</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>© 2026 <a href="index.html">Audio Intel</a>. Crafted with 🎧 for music lovers everywhere.</p>
+    </footer>
+
+    <script>
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('open');
+        });
+        const observer = new IntersectionObserver(
+            entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+            { threshold: 0.15 }
+        );
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>

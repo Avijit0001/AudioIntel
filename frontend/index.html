@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audio Intel — Your Perfect Headphone Match</title>
+  <meta name="description"
+    content="Audio Intel helps you find the perfect headphones tailored to your listening style, budget and preferences through AI-powered recommendations." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 140px 24px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      border-radius: 40px;
+      background: rgba(124, 58, 237, .12);
+      border: 1px solid var(--glass-border);
+      color: var(--primary-light);
+      font-size: .85rem;
+      font-weight: 500;
+      margin-bottom: 28px;
+      animation: fadeInUp .8s ease-out;
+    }
+
+    .hero-badge .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: .5;
+        transform: scale(1.3);
+      }
+    }
+
+    .hero h1 {
+      font-size: 4.2rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+      animation: fadeInUp .8s ease-out .1s both;
+    }
+
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 50%, var(--warm-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin: 0 auto 40px;
+      animation: fadeInUp .8s ease-out .2s both;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeInUp .8s ease-out .3s both;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-visual {
+      margin-top: 60px;
+      position: relative;
+      animation: fadeInUp 1s ease-out .5s both;
+    }
+
+    .hero-visual .headphone-card {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-visual .h-card {
+      width: 200px;
+      padding: 24px;
+      border-radius: var(--radius);
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .hero-visual .h-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--primary-light);
+      box-shadow: 0 12px 40px var(--primary-glow);
+    }
+
+    .hero-visual .h-card .icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    .hero-visual .h-card h4 {
+      font-size: .95rem;
+      margin-bottom: 4px;
+    }
+
+    .hero-visual .h-card p {
+      font-size: .8rem;
+      color: var(--text-muted);
+      margin: 0;
+      animation: none;
+    }
+
+    /* ===== FEATURES SECTION ===== */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      padding: 36px 28px;
+      border-radius: var(--radius);
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      transition: var(--transition);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-light);
+      box-shadow: 0 8px 32px var(--primary-glow);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+
+    .feature-icon.purple {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+
+    .feature-icon.cyan {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    }
+
+    .feature-icon.amber {
+      background: linear-gradient(135deg, var(--warm), #d97706);
+    }
+
+    .feature-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      color: var(--text-secondary);
+      font-size: .95rem;
+    }
+
+    /* ===== HOW IT WORKS ===== */
+    .steps {
+      display: flex;
+      gap: 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .step {
+      flex: 1;
+      min-width: 220px;
+      text-align: center;
+      padding: 32px 20px;
+      position: relative;
+    }
+
+    .step-number {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.3rem;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 24px var(--primary-glow);
+    }
+
+    .step h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      color: var(--text-secondary);
+      font-size: .9rem;
+    }
+
+
+
+    /* ===== CTA SECTION ===== */
+    .cta-section {
+      text-align: center;
+    }
+
+    .cta-box {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 56px 40px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(124, 58, 237, .15), rgba(6, 182, 212, .1));
+      border: 1px solid var(--glass-border);
+    }
+
+    .cta-box h2 {
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+    }
+
+    .cta-box p {
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.6rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      .steps {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Animated background -->
+  <div class="bg-glow">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">🎧</div>
+      <span>Audio Intel</span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" class="active">Home</a>
+      <a href="login.html">Login</a>
+      <a href="chat.html">Recommend</a>
+      <a href="about.html">About</a>
+      <a href="login.html" class="btn btn-primary btn-sm">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      AI-Powered Headphone Recommendations
+    </div>
+
+    <h1>Find Your <span class="gradient">Perfect Sound</span></h1>
+
+    <p>Discover headphones tailored to your lifestyle, music taste and budget. Our intelligent recommendation engine
+      matches you with your ideal audio companion.</p>
+
+    <div class="hero-buttons">
+      <a href="login.html" class="btn btn-primary btn-lg">Get Started →</a>
+      <a href="about.html" class="btn btn-outline btn-lg">Learn More</a>
+    </div>
+
+    <div class="hero-visual">
+      <div class="headphone-card">
+        <div class="h-card">
+          <div class="icon">🎵</div>
+          <h4>Music Lovers</h4>
+          <p>Rich bass & clarity</p>
+        </div>
+        <div class="h-card">
+          <div class="icon">🎮</div>
+          <h4>Gamers</h4>
+          <p>Spatial surround</p>
+        </div>
+        <div class="h-card">
+          <div class="icon">💼</div>
+          <h4>Professionals</h4>
+          <p>ANC & comfort</p>
+        </div>
+        <div class="h-card">
+          <div class="icon">🏃</div>
+          <h4>Athletes</h4>
+          <p>Sweat-proof fit</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section">
+    <h2 class="section-title fade-up"><span class="gradient">Why Audio Intel?</span></h2>
+    <p class="section-subtitle fade-up delay-1">We combine deep audio knowledge with smart technology to help you find
+      headphones you'll love.</p>
+
+    <div class="features">
+      <div class="feature-card fade-up delay-1">
+        <div class="feature-icon purple">🤖</div>
+        <h3>AI Recommendations</h3>
+        <p>Our intelligent chat assistant analyzes your preferences and recommends the perfect headphones from thousands
+          of options.</p>
+      </div>
+      <div class="feature-card fade-up delay-2">
+        <div class="feature-icon cyan">📊</div>
+        <h3>Expert Reviews</h3>
+        <p>Access in-depth reviews from audio professionals and real users to make informed decisions before you buy.
+        </p>
+      </div>
+      <div class="feature-card fade-up delay-3">
+        <div class="feature-icon amber">💰</div>
+        <h3>Budget Friendly</h3>
+        <p>Find the best headphones at every price point. From budget picks to premium audiophile gear — we cover it
+          all.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section">
+    <h2 class="section-title fade-up">How It <span class="gradient">Works</span></h2>
+    <p class="section-subtitle fade-up delay-1">Three simple steps to find your perfect headphones</p>
+
+    <div class="steps">
+      <div class="step fade-up delay-1">
+        <div class="step-number">1</div>
+        <h3>Create Account</h3>
+        <p>Sign up for free and tell us about your music preferences.</p>
+      </div>
+      <div class="step fade-up delay-2">
+        <div class="step-number">2</div>
+        <h3>Chat With AI</h3>
+        <p>Describe what you're looking for and our AI will understand your needs.</p>
+      </div>
+      <div class="step fade-up delay-3">
+        <div class="step-number">3</div>
+        <h3>Get Matched</h3>
+        <p>Receive personalized headphone recommendations with detailed comparisons.</p>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- CTA Section -->
+  <section class="section cta-section">
+    <div class="cta-box fade-up">
+      <h2>Ready to Find Your <span class="text-gradient">Perfect Sound?</span></h2>
+      <p>Join thousands of happy listeners who found their ideal headphones through Audio Intel.</p>
+      <a href="login.html" class="btn btn-primary btn-lg">Get Started Free →</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2026 <a href="index.html">Audio Intel</a>. Crafted with 🎧 for music lovers everywhere.</p>
+  </footer>
+
+  <script>
+    // Mobile nav toggle
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+
+    // Scroll reveal
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.15 }
+    );
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Duplicate review cards for seamless infinite scroll
+    const track = document.getElementById('reviewsTrack');
+    if (track) {
+      track.innerHTML += track.innerHTML;
+    }
+  </script>
+</body>
+
+</html>
