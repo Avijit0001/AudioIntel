@@ -50,3 +50,5 @@ langgraph-prebuilt
 langsmith
 langchain-ollama
 openai
+groq
+chromadb
