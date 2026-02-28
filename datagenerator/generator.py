@@ -1,52 +1,59 @@
 """
-generator.py
-------------
-Reads an existing product CSV (columns: name, description, price, URL),
-calls the Groq LLM for each row via a structured function/tool call to
-classify the product, then writes three new columns back to the same CSV:
+json_enricher.py
+----------------
+Reads  : datagenerator/pickaboo_structured_products.json
+         (fields: product_name, description, price, url)
 
-  • type        : Headphone | TWS | Neckband | Earphone
-  • Connectivity: Wired | Wireless
-  • Use Cases   : General | Music | Gaming | Studio | Travel
+Calls  : a local Ollama model once per product using a custom
+         'enrich_product' tool/function-call to predict:
+
+           • type        : Earphone | Headphone | Neckband | TWS
+           • Connectivity: Wired | Wireless
+           • Use Cases   : one or more of Gaming | General | Music | Studio | Travel
+
+Writes : datagenerator/pickaboo_enriched_products.json
+         (original fields + 3 new fields per product)
+
+Usage  : python datagenerator/json_enricher.py
 """
 
-import csv
 import json
 import os
 import sys
+import time
 
-import dotenv
-from groq import Groq
+import ollama
 
 # --------------------------------------------------------------------------- #
 # Config                                                                       #
 # --------------------------------------------------------------------------- #
-dotenv.load_dotenv()
+BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
+INPUT_FILE  = os.path.join(BASE_DIR, "pickaboo_structured_products.json")
+OUTPUT_FILE = os.path.join(BASE_DIR, "pickaboo_enriched_products.json")
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-if not GROQ_API_KEY:
-    sys.exit("[ERROR] GROQ_API_KEY not found in environment / .env file.")
+MODEL = "qwen3:0.6b"   # change to any Ollama model that supports tool-calls
+                     # e.g. "mistral", "qwen2.5", "llama3.1"
 
-client = Groq(api_key=GROQ_API_KEY)
+RETRY_LIMIT = 3      # retries per product on transient errors
+RETRY_DELAY = 2      # seconds between retries
 
-MODEL = "llama3-70b-8192"          # fast & capable Groq model; change if needed
-
-# Allowed option sets (used both in the tool schema and for validation)
-VALID_TYPE         = {"Headphone", "TWS", "Neckband", "Earphone"}
+# Allowed value sets — single source of truth for schema + validation
+VALID_TYPE         = {"Earphone", "Headphone", "Neckband", "TWS"}
 VALID_CONNECTIVITY = {"Wired", "Wireless"}
-VALID_USE_CASES    = {"General", "Music", "Gaming", "Studio", "Travel"}
+VALID_USE_CASES    = {"Gaming", "General", "Music", "Studio", "Travel"}
 
 # --------------------------------------------------------------------------- #
-# Tool definition                                                              #
+# Tool definition (JSON Schema)                                                #
 # --------------------------------------------------------------------------- #
-tools = [
+TOOLS = [
     {
         "type": "function",
         "function": {
             "name": "enrich_product",
             "description": (
-                "Classify an audio product into its type, connectivity, and "
-                "primary use-case based on its name, description, and price."
+                "Classify an audio product based on its name, description, and "
+                "price. Return its category type, connectivity method, and all "
+                "applicable use-cases."
             ),
             "parameters": {
                 "type": "object",
@@ -54,176 +61,189 @@ tools = [
                     "type": {
                         "type": "string",
                         "enum": sorted(VALID_TYPE),
-                        "description": "Category of the audio product."
+                        "description": (
+                            "The product category. "
+                            "Earphone=wired in-ear, TWS=true-wireless stereo buds, "
+                            "Neckband=wireless neckband style, Headphone=over/on-ear."
+                        ),
                     },
                     "Connectivity": {
                         "type": "string",
                         "enum": sorted(VALID_CONNECTIVITY),
-                        "description": "How the product connects to a device."
+                        "description": (
+                            "How the product connects to a source device. "
+                            "Wired=3.5mm jack or USB, Wireless=Bluetooth."
+                        ),
                     },
                     "Use Cases": {
                         "type": "array",
                         "items": {
                             "type": "string",
-                            "enum": sorted(VALID_USE_CASES)
+                            "enum": sorted(VALID_USE_CASES),
                         },
                         "minItems": 1,
                         "uniqueItems": True,
-                        "description": "One or more use-cases that apply to this product."
-                    }
+                        "description": (
+                            "All use-cases that apply to this product. "
+                            "Pick every relevant option: "
+                            "General=everyday use, Music=audiophile/hi-fi, "
+                            "Gaming=low-latency/mic focus, Studio=monitoring/flat response, "
+                            "Travel=portability/noise isolation."
+                        ),
+                    },
                 },
-                "required": ["type", "Connectivity", "Use Cases"]
-            }
-        }
+                "required": ["type", "Connectivity", "Use Cases"],
+            },
+        },
     }
 ]
 
 # --------------------------------------------------------------------------- #
 # Core classifier                                                              #
 # --------------------------------------------------------------------------- #
-def classify_product(name: str, description: str, price: str) -> dict:
+def classify_product(product_name: str, description: str, price: str) -> dict | None:
     """
-    Sends one product to the LLM via a forced tool call and returns a dict:
-    {"type": ..., "Connectivity": ..., "Use Cases": ...}
-    Falls back to empty strings on any error.
+    Calls the local Ollama model with a forced tool-call and returns:
+        {"type": str, "Connectivity": str, "Use Cases": list[str]}
+    Returns None on unrecoverable failure.
     """
-    user_prompt = (
-        f"Product Name   : {name}\n"
-        f"Description    : {description}\n"
-        f"Price          : {price}\n\n"
-        "Based on the information above, call the `enrich_product` tool to "
+    prompt = (
+        f"Product Name : {product_name}\n"
+        f"Description  : {description}\n"
+        f"Price (BDT)  : {price}\n\n"
+        "Using only the information above, call the `enrich_product` tool to "
         "classify this audio product."
     )
 
-    try:
-        response = client.chat.completions.create(
-            model=MODEL,
-            messages=[{"role": "user", "content": user_prompt}],
-            tools=tools,
-            tool_choice={"type": "function", "function": {"name": "enrich_product"}},
-        )
+    for attempt in range(1, RETRY_LIMIT + 1):
+        try:
+            response = ollama.chat(
+                model=MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                tools=TOOLS,
+            )
 
-        message = response.choices[0].message
+            message = response.message
 
-        if not message.tool_calls:
-            print(f"  [WARN] No tool call returned for '{name}'. Skipping.")
-            return {"type": "", "Connectivity": "", "Use Cases": ""}
+            # Check the tool was actually called
+            if not message.tool_calls:
+                print(f"    [WARN] Attempt {attempt}: no tool call returned. Retrying…")
+                time.sleep(RETRY_DELAY)
+                continue
 
-        args = json.loads(message.tool_calls[0].function.arguments)
+            # Parse the arguments from the first tool call
+            raw = message.tool_calls[0].function.arguments
 
-        # Validate each field; fall back to empty string if unexpected value
-        product_type   = args.get("type", "")
-        connectivity   = args.get("Connectivity", "")
-        use_cases_raw  = args.get("Use Cases", [])
+            # ollama SDK may return a dict directly or a JSON string
+            args = raw if isinstance(raw, dict) else json.loads(raw)
 
-        # Normalise: the LLM might occasionally return a plain string instead of a list
-        if isinstance(use_cases_raw, str):
-            use_cases_raw = [use_cases_raw]
+            product_type  = args.get("type", "")
+            connectivity  = args.get("Connectivity", "")
+            use_cases_raw = args.get("Use Cases", [])
 
-        if product_type not in VALID_TYPE:
-            print(f"  [WARN] Unexpected type '{product_type}' for '{name}'. Keeping as-is.")
-        if connectivity not in VALID_CONNECTIVITY:
-            print(f"  [WARN] Unexpected connectivity '{connectivity}' for '{name}'. Keeping as-is.")
-        for uc in use_cases_raw:
-            if uc not in VALID_USE_CASES:
-                print(f"  [WARN] Unexpected use-case '{uc}' for '{name}'. Keeping as-is.")
+            # Normalise: guard against LLM returning a string instead of list
+            if isinstance(use_cases_raw, str):
+                use_cases_raw = [u.strip() for u in use_cases_raw.split("|") if u.strip()]
 
-        # Store as pipe-separated string so the CSV cell stays clean
-        use_cases = "|".join(use_cases_raw)
+            # Validate — warn but keep value (enum in schema already constrains the LLM)
+            if product_type not in VALID_TYPE:
+                print(f"    [WARN] Unexpected type '{product_type}' — keeping as-is.")
+            if connectivity not in VALID_CONNECTIVITY:
+                print(f"    [WARN] Unexpected connectivity '{connectivity}' — keeping as-is.")
+            for uc in use_cases_raw:
+                if uc not in VALID_USE_CASES:
+                    print(f"    [WARN] Unexpected use-case '{uc}' — keeping as-is.")
 
-        return {
-            "type"        : product_type,
-            "Connectivity": connectivity,
-            "Use Cases"   : use_cases,   # pipe-separated, e.g. "Music|Gaming"
-        }
+            return {
+                "type":         product_type,
+                "Connectivity": connectivity,
+                "Use Cases":    use_cases_raw,   # kept as list in JSON output
+            }
 
-    except Exception as exc:
-        print(f"  [ERROR] LLM call failed for '{name}': {exc}")
-        return {"type": "", "Connectivity": "", "Use Cases": ""}
+        except Exception as exc:
+            print(f"    [ERROR] Attempt {attempt} failed: {exc}")
+            if attempt < RETRY_LIMIT:
+                time.sleep(RETRY_DELAY)
+
+    # All retries exhausted
+    return None
 
 
 # --------------------------------------------------------------------------- #
-# CSV I/O                                                                      #
+# Main enrichment pipeline                                                     #
 # --------------------------------------------------------------------------- #
-def enrich_csv(input_path: str, output_path: str | None = None) -> None:
-    """
-    Read the CSV at `input_path`, classify every row, and write the enriched
-    CSV to `output_path` (defaults to overwriting `input_path`).
+def enrich_json(input_path: str, output_path: str) -> None:
+    """Read input JSON, classify each product, write enriched JSON."""
 
-    Expected input columns : name, description, price, URL
-    Added output columns   : type, Connectivity, Use Cases
-    """
-    if output_path is None:
-        output_path = input_path
+    # ----- load -----
+    with open(input_path, encoding="utf-8") as f:
+        products: list[dict] = json.load(f)
 
-    # ---------- read ----------
-    with open(input_path, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        fieldnames = reader.fieldnames or []
-        rows = list(reader)
-
-    if not rows:
-        print("[INFO] CSV is empty – nothing to process.")
+    if not products:
+        print("[INFO] Input JSON is empty — nothing to do.")
         return
 
-    # Ensure required columns exist
-    for required_col in ("name", "description", "price", "URL"):
-        if required_col not in fieldnames:
-            sys.exit(f"[ERROR] Required column '{required_col}' not found in CSV.")
+    print(f"[INFO] Loaded {len(products)} product(s) from '{input_path}'")
+    print(f"[INFO] Model : {MODEL}")
+    print(f"[INFO] Output: {output_path}\n")
 
-    # Build output fieldnames (keep originals, add new cols if not already present)
-    new_cols = ["type", "Connectivity", "Use Cases"]
-    output_fieldnames = list(fieldnames)
-    for col in new_cols:
-        if col not in output_fieldnames:
-            output_fieldnames.append(col)
+    enriched: list[dict] = []
+    success_count = 0
+    skip_count    = 0
 
-    print(f"[INFO] Processing {len(rows)} product(s) from '{input_path}' …\n")
+    for idx, product in enumerate(products, start=1):
+        name  = product.get("product_name", "").strip()
+        desc  = product.get("description",  "").strip()
+        price = product.get("price",        "").strip()
 
-    # ---------- classify each row ----------
-    for idx, row in enumerate(rows, start=1):
-        name        = row.get("name", "").strip()
-        description = row.get("description", "").strip()
-        price       = row.get("price", "").strip()
+        print(f"  [{idx:>2}/{len(products)}] {name}")
 
-        print(f"  [{idx}/{len(rows)}] Classifying: {name}")
+        # ----- resume safety: skip already-enriched rows -----
+        if all(k in product for k in ("type", "Connectivity", "Use Cases")):
+            print(f"         ↳ already enriched, skipping.")
+            enriched.append(product)
+            skip_count += 1
+            continue
 
-        classification = classify_product(name, description, price)
-        row.update(classification)
+        result = classify_product(name, desc, price)
 
-        print(
-            f"         → type={classification['type']} | "
-            f"Connectivity={classification['Connectivity']} | "
-            f"Use Cases={classification['Use Cases']}"
-        )
+        if result is None:
+            print(f"         ↳ [FAIL] Could not classify after {RETRY_LIMIT} attempts. Nulls inserted.")
+            product.update({"type": None, "Connectivity": None, "Use Cases": None})
+        else:
+            product.update(result)
+            success_count += 1
+            print(
+                f"         ↳ type={result['type']} | "
+                f"Connectivity={result['Connectivity']} | "
+                f"Use Cases={result['Use Cases']}"
+            )
 
-    # ---------- write ----------
-    with open(output_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=output_fieldnames, extrasaction="ignore")
-        writer.writeheader()
-        writer.writerows(rows)
+        enriched.append(product)
 
-    print(f"\n[DONE] Enriched CSV written to '{output_path}'.")
+    # ----- write -----
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(enriched, f, ensure_ascii=False, indent=4)
+
+    # ----- summary -----
+    print(f"\n{'='*55}")
+    print(f"  Done!")
+    print(f"  Products processed : {len(products)}")
+    print(f"  Newly classified   : {success_count}")
+    print(f"  Already had data   : {skip_count}")
+    print(f"  Output written to  : {output_path}")
+    print(f"{'='*55}")
 
 
 # --------------------------------------------------------------------------- #
 # Entry point                                                                  #
 # --------------------------------------------------------------------------- #
 if __name__ == "__main__":
-    # Accept an optional CSV path as a command-line argument
-    # Usage:  python generator.py [path/to/products.csv] [optional/output.csv]
-    if len(sys.argv) < 2:
-        sys.exit(
-            "Usage: python generator.py <input_csv> [output_csv]\n"
-            "  input_csv  – CSV with columns: name, description, price, URL\n"
-            "  output_csv – (optional) path to save enriched CSV; "
-            "defaults to overwriting input_csv"
-        )
+    # Optional CLI overrides:  python json_enricher.py [input.json] [output.json]
+    input_path  = sys.argv[1] if len(sys.argv) > 1 else INPUT_FILE
+    output_path = sys.argv[2] if len(sys.argv) > 2 else OUTPUT_FILE
 
-    input_csv  = sys.argv[1]
-    output_csv = sys.argv[2] if len(sys.argv) >= 3 else None
+    if not os.path.isfile(input_path):
+        sys.exit(f"[ERROR] Input file not found: {input_path}")
 
-    if not os.path.isfile(input_csv):
-        sys.exit(f"[ERROR] File not found: {input_csv}")
-
-    enrich_csv(input_csv, output_csv)
+    enrich_json(input_path, output_path)
