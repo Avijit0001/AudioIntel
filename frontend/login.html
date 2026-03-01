@@ -413,15 +413,25 @@
             text.style.color = levels[score].c;
         }
 
-        // Login handler — uses shared auth module
-        function handleLogin(e) {
+        // Login handler — calls FastAPI → Supabase
+        async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
-            window.audioIntelAuth.login(email);
+            const password = document.getElementById('loginPassword').value;
+            const btn = e.target.querySelector('.auth-submit');
+            btn.disabled = true;
+            btn.textContent = 'Signing in…';
+            try {
+                await window.audioIntelAuth.login(email, password);
+            } catch (err) {
+                alert(err.message || 'Sign-in failed. Please check your credentials.');
+                btn.disabled = false;
+                btn.textContent = 'Sign In';
+            }
         }
 
-        // Register handler — uses shared auth module
-        function handleRegister(e) {
+        // Register handler — calls FastAPI → Supabase
+        async function handleRegister(e) {
             e.preventDefault();
             const pw = document.getElementById('regPassword').value;
             const confirm = document.getElementById('regConfirm').value;
@@ -430,7 +440,17 @@
                 return;
             }
             const fullName = document.getElementById('regName').value;
-            window.audioIntelAuth.register(fullName);
+            const email = document.getElementById('regEmail').value;
+            const btn = e.target.querySelector('.auth-submit');
+            btn.disabled = true;
+            btn.textContent = 'Creating account…';
+            try {
+                await window.audioIntelAuth.register(fullName, email, pw);
+            } catch (err) {
+                alert(err.message || 'Registration failed. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
         }
     </script>
 </body>

@@ -3,35 +3,8 @@ document.getElementById('navToggle').addEventListener('click', () => {
   document.getElementById('navLinks').classList.toggle('open');
 });
 
-// ===== PRODUCT URL MAP =====
-// Maps product names to real product/search URLs
-const productUrls = {
-  "Sony WH-1000XM5": "https://www.amazon.com/s?k=Sony+WH-1000XM5",
-  "Bose QC Ultra": "https://www.amazon.com/s?k=Bose+QuietComfort+Ultra",
-  "Sennheiser Momentum 4": "https://www.amazon.com/s?k=Sennheiser+Momentum+4+Wireless",
-  "JBL Tune 770NC": "https://www.amazon.com/s?k=JBL+Tune+770NC",
-  "Beyerdynamic DT 900 Pro X": "https://www.amazon.com/s?k=Beyerdynamic+DT+900+Pro+X",
-  "Audio-Technica ATH-M50x": "https://www.amazon.com/s?k=Audio-Technica+ATH-M50x",
-  "Sony MDR-7506": "https://www.amazon.com/s?k=Sony+MDR-7506",
-  "HiFiMAN Sundara": "https://www.amazon.com/s?k=HiFiMAN+Sundara",
-  "AirPods Pro 2": "https://www.amazon.com/s?k=AirPods+Pro+2",
-  "Sony WF-1000XM5": "https://www.amazon.com/s?k=Sony+WF-1000XM5",
-  "Samsung Galaxy Buds3 Pro": "https://www.amazon.com/s?k=Samsung+Galaxy+Buds3+Pro",
-  "Nothing Ear 2": "https://www.amazon.com/s?k=Nothing+Ear+2",
-  "Jabra Elite 85t": "https://www.amazon.com/s?k=Jabra+Elite+85t",
-  "JBL Tour Pro 2": "https://www.amazon.com/s?k=JBL+Tour+Pro+2",
-  "Google Pixel Buds Pro 2": "https://www.amazon.com/s?k=Google+Pixel+Buds+Pro+2",
-  "Beats Fit Pro": "https://www.amazon.com/s?k=Beats+Fit+Pro",
-  "Sony WI-1000XM2": "https://www.amazon.com/s?k=Sony+WI-1000XM2",
-  "JBL Tune Beam": "https://www.amazon.com/s?k=JBL+Tune+Beam",
-  "OnePlus Bullets Z2": "https://www.amazon.com/s?k=OnePlus+Bullets+Z2",
-  "Moondrop Aria": "https://www.amazon.com/s?k=Moondrop+Aria",
-  "Shure SE846": "https://www.amazon.com/s?k=Shure+SE846",
-  "Truthear HEXA": "https://www.amazon.com/s?k=Truthear+HEXA",
-  "KZ ZS10 Pro": "https://www.amazon.com/s?k=KZ+ZS10+Pro",
-  "SteelSeries Arctis Nova Pro": "https://www.amazon.com/s?k=SteelSeries+Arctis+Nova+Pro",
-  "HyperX Cloud III": "https://www.amazon.com/s?k=HyperX+Cloud+III",
-};
+// ===== API CONFIG =====
+const API_BASE = window.audioIntelAuth?.API_BASE || 'http://localhost:8000';
 
 // ===== EMBEDDED BROWSER =====
 let browserHistory = [];
@@ -163,8 +136,18 @@ function resetFilters() {
   document.getElementById('brandFilter').value = 'all';
 }
 
-// ===== CHAT BOT =====
-// Detect URLs in any text and wrap them as clickable links
+// ===== GATHER CURRENT FILTERS =====
+function getActiveFilters() {
+  return {
+    product_type: activeType,
+    connectivity: activeConnect,
+    budget: parseInt(document.getElementById('budgetSlider').value, 10),
+    use_case: document.getElementById('useCaseFilter').value,
+    brand: document.getElementById('brandFilter').value,
+  };
+}
+
+// ===== CHAT RENDERING =====
 const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
 
 function linkifyUrls(text) {
@@ -174,55 +157,22 @@ function linkifyUrls(text) {
   });
 }
 
-// Helper: wraps **Product Name** with a clickable link that opens in the browser pane
-function makeProductLinks(text) {
-  // First, handle **bold product names**
-  let result = text.replace(/\*\*(.*?)\*\*/g, (match, name) => {
-    const url = productUrls[name];
-    if (url) {
-      return `<a class="product-link" onclick="event.preventDefault();openInBrowser('${url}')" href="#" title="View ${name} in browser">${name}</a>`;
-    }
-    return `<strong>${name}</strong>`;
-  });
-  // Then, linkify any raw URLs in the text
+/**
+ * Render markdown-like formatting from the LLM response:
+ *  - **bold** → <strong>
+ *  - Bullet lists (- or •)
+ *  - URLs → clickable links that open in browser pane
+ */
+function formatBotReply(text) {
+  // Bold
+  let result = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Linkify URLs
   result = linkifyUrls(result);
+  // Simple bullet list formatting
+  result = result.replace(/^[\-•]\s+/gm, '&bull; ');
+  // Line breaks → <br>
+  result = result.replace(/\n/g, '<br>');
   return result;
-}
-
-const botResponses = {
-  bass: "For bass lovers, I'd recommend the **Sony WH-1000XM5** (over-ear, $298) or **JBL Tune 770NC** (budget $79). Both deliver deep, punchy bass. Click any product to browse it →",
-  noise: "Top ANC picks: **Bose QC Ultra** (best silence, $349), **Sony WH-1000XM5** (best all-rounder, $298), and **AirPods Pro 2** (compact ANC, $199). Click to view details →",
-  gaming: "For gaming: **SteelSeries Arctis Nova Pro** (best spatial audio, $349) or **HyperX Cloud III** (budget-friendly, $99). Both offer low latency and clear mics. Click to browse →",
-  wireless: "Best wireless: **Sony WH-1000XM5** ($298, 30h), **Sennheiser Momentum 4** ($279, 60h!), or **JBL Tune 770NC** ($79, 44h). Click a product to see it →",
-  budget: "Great budget picks: **JBL Tune 770NC** ($79 headphone), **Nothing Ear 2** ($99 TWS), **OnePlus Bullets Z2** ($29 neckband), or **Moondrop Aria** ($79 IEM). Click to browse →",
-  workout: "For workouts: **Beats Fit Pro** (secure wingtips, $159), **Samsung Galaxy Buds3 Pro** (IPX7, $179). Both are sweat and splash proof! Click to view →",
-  studio: "Studio picks: **Beyerdynamic DT 900 Pro X** (open-back mixing, $249), **Audio-Technica ATH-M50x** (closed monitoring, $149), **Sony MDR-7506** (studio legend, $89). Click any →",
-  tws: "Top TWS: **AirPods Pro 2** (best for iPhone, $199), **Sony WF-1000XM5** (best ANC, $228), **Samsung Galaxy Buds3 Pro** (Android, $179). Click to view →",
-  neckband: "Best neckbands: **Sony WI-1000XM2** ($248, ANC), **JBL Tune Beam** ($49, 32h battery), **OnePlus Bullets Z2** ($29, fast charge). Click to browse →",
-  earphone: "Wired IEM picks: **Moondrop Aria** ($79, Harman-tuned), **Truthear HEXA** ($79, hybrid), **Shure SE846** ($699, audiophile). Click a link to view →",
-  headphone: "Best headphones: **Sony WH-1000XM5** (overall, $298), **Bose QC Ultra** (ANC, $349), **Sennheiser Momentum 4** (60h, $279), **HiFiMAN Sundara** (planar, $299). Click to browse →",
-  travel: "For travel: **Bose QC Ultra** (best ANC, $349), **Sony WH-1000XM5** (30h + multipoint, $298), or **AirPods Pro 2** (compact, $199). Click any product →",
-  default: "I'd love to help! Ask about headphones, TWS, neckbands, or earphones. I'll recommend products with clickable links — click any to view in the browser panel on the right! What matters most — sound, comfort, ANC, or price?"
-};
-
-function getResponse(msg) {
-  const lower = msg.toLowerCase();
-  for (const [key, val] of Object.entries(botResponses)) {
-    if (key !== 'default' && lower.includes(key)) return val;
-  }
-  if (/\$\d+|under|budget|cheap|affordable/i.test(lower)) return botResponses.budget;
-  if (/cancel|quiet|silent|anc/i.test(lower)) return botResponses.noise;
-  if (/run|gym|sport|exercise|sweat/i.test(lower)) return botResponses.workout;
-  if (/plane|flight|commut/i.test(lower)) return botResponses.travel;
-  if (/mix|master|monitor|record|produc/i.test(lower)) return botResponses.studio;
-  if (/game|fps|spatial/i.test(lower)) return botResponses.gaming;
-  // Check for specific product by name
-  for (const name of Object.keys(productUrls)) {
-    if (lower.includes(name.toLowerCase())) {
-      return `Here's the **${name}** — a great choice! Click the link to browse it in the panel. I can compare it with others if you'd like.`;
-    }
-  }
-  return botResponses.default;
 }
 
 function addMessage(text, type) {
@@ -232,8 +182,7 @@ function addMessage(text, type) {
   const avatar = type === 'bot' ? '🎧' : '👤';
   const div = document.createElement('div');
   div.className = `message ${type}`;
-  // For bot: process product names + URLs; For user: also linkify URLs
-  const processedText = type === 'bot' ? makeProductLinks(text) : linkifyUrls(text);
+  const processedText = type === 'bot' ? formatBotReply(text) : linkifyUrls(text);
   div.innerHTML = `<div class="msg-avatar">${avatar}</div><div class="msg-content">${processedText}</div>`;
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
@@ -254,7 +203,27 @@ function removeTyping() {
   if (t) t.remove();
 }
 
-function sendMessage() {
+// ===== CALL THE BACKEND RAG CHATBOT =====
+async function getAIResponse(message) {
+  const filters = getActiveFilters();
+
+  const res = await fetch(`${API_BASE}/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, filters }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to get response from AI');
+  }
+
+  const data = await res.json();
+  return data; // { reply, sources }
+}
+
+// ===== SEND MESSAGE =====
+async function sendMessage() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
   if (!text) return;
@@ -265,19 +234,23 @@ function sendMessage() {
   const urlMatch = text.match(urlRegex);
   if (urlMatch) {
     openInBrowser(urlMatch[0]);
-    showTyping();
-    setTimeout(() => {
-      removeTyping();
-      addMessage(`I've opened that link in the browser panel for you! 🌐 If it's a product page, I can help compare it with alternatives — just ask.`, 'bot');
-    }, 600);
-    return;
   }
 
   showTyping();
-  setTimeout(() => {
+
+  try {
+    const data = await getAIResponse(text);
     removeTyping();
-    addMessage(getResponse(text), 'bot');
-  }, 800 + Math.random() * 800);
+    addMessage(data.reply, 'bot');
+
+    // If the response contains product URLs, auto-open the first one in the browser
+    if (data.sources && data.sources.length > 0 && data.sources[0].url) {
+      openInBrowser(data.sources[0].url);
+    }
+  } catch (err) {
+    removeTyping();
+    addMessage(`Sorry, something went wrong: ${err.message}. Please try again.`, 'bot');
+  }
 }
 
 function sendQuick(text) {

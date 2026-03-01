@@ -1,5 +1,5 @@
 from langchain_ollama import OllamaEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 
 embeddings = OllamaEmbeddings(model="nomic-embed-text:latest")
 
