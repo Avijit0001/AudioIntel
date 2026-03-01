@@ -28,8 +28,8 @@ import ollama
 # Config                                                                       #
 # --------------------------------------------------------------------------- #
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
-INPUT_FILE  = os.path.join(BASE_DIR, "pickaboo_structured_products.json")
-OUTPUT_FILE = os.path.join(BASE_DIR, "pickaboo_enriched_products.json")
+INPUT_FILE  = os.path.join(BASE_DIR, "startech_structured_products.json")
+OUTPUT_FILE = os.path.join(BASE_DIR, "startech_enriched_products.json")
 
 MODEL = "qwen3:0.6b"   # change to any Ollama model that supports tool-calls
                      # e.g. "mistral", "qwen2.5", "llama3.1"
