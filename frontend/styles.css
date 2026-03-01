@@ -196,6 +196,36 @@ ul { list-style: none; }
   background: linear-gradient(90deg, var(--primary), var(--accent));
 }
 
+/* ---------- Nav User Badge ---------- */
+.nav-user-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 8px;
+}
+
+.nav-user-name {
+  color: var(--text-secondary);
+  font-size: .9rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.nav-logout-btn {
+  padding: 8px 18px !important;
+  font-size: .85rem !important;
+}
+
+@media (max-width: 768px) {
+  .nav-user-badge {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-left: 0;
+    padding: 8px 12px;
+  }
+}
+
 /* ---------- Buttons ---------- */
 .btn {
   display: inline-flex;

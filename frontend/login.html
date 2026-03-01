@@ -260,10 +260,7 @@
         </a>
         <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
         <div class="nav-links" id="navLinks">
-            <a href="index.html">Home</a>
-            <a href="login.html" class="active">Login</a>
-            <a href="chat.html">Recommend</a>
-            <a href="about.html">About</a>
+            <!-- Populated dynamically by auth.js -->
         </div>
     </nav>
 
@@ -367,11 +364,12 @@
         <p>© 2026 <a href="index.html">Audio Intel</a>. Crafted with 🎧 for music lovers everywhere.</p>
     </footer>
 
+    <script src="auth.js"></script>
     <script>
-        // Mobile nav
-        document.getElementById('navToggle').addEventListener('click', () => {
-            document.getElementById('navLinks').classList.toggle('open');
-        });
+        // If already logged in, redirect away from login page
+        if (window.audioIntelAuth && window.audioIntelAuth.isLoggedIn()) {
+            window.location.href = 'chat.html';
+        }
 
         // Auth tabs
         document.querySelectorAll('.auth-tab').forEach(tab => {
@@ -415,14 +413,14 @@
             text.style.color = levels[score].c;
         }
 
-        // Login handler
+        // Login handler — uses shared auth module
         function handleLogin(e) {
             e.preventDefault();
-            // Simulate successful login
-            window.location.href = 'chat.html';
+            const email = document.getElementById('loginEmail').value;
+            window.audioIntelAuth.login(email);
         }
 
-        // Register handler
+        // Register handler — uses shared auth module
         function handleRegister(e) {
             e.preventDefault();
             const pw = document.getElementById('regPassword').value;
@@ -431,8 +429,8 @@
                 alert('Passwords do not match!');
                 return;
             }
-            // Simulate successful registration
-            window.location.href = 'chat.html';
+            const fullName = document.getElementById('regName').value;
+            window.audioIntelAuth.register(fullName);
         }
     </script>
 </body>

@@ -286,8 +286,7 @@
         </a>
         <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
         <div class="nav-links" id="navLinks">
-            <a href="index.html">Home</a><a href="login.html">Login</a>
-            <a href="chat.html">Recommend</a><a href="about.html" class="active">About</a>
+            <!-- Populated dynamically by auth.js -->
         </div>
     </nav>
 
@@ -427,10 +426,8 @@
         <p>© 2026 <a href="index.html">Audio Intel</a>. Crafted with 🎧 for music lovers everywhere.</p>
     </footer>
 
+    <script src="auth.js"></script>
     <script>
-        document.getElementById('navToggle').addEventListener('click', () => {
-            document.getElementById('navLinks').classList.toggle('open');
-        });
         const observer = new IntersectionObserver(
             entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
             { threshold: 0.15 }
