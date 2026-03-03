@@ -6,44 +6,62 @@ document.getElementById('navToggle').addEventListener('click', () => {
 // ===== API CONFIG =====
 const API_BASE = window.audioIntelAuth?.API_BASE || 'http://localhost:8000';
 
-// ===== EMBEDDED BROWSER =====
-let browserHistory = [];
-let browserHistoryIndex = -1;
+// ===== PRODUCT PANEL (replaces embedded browser) =====
+// Most websites block iframe embedding (X-Frame-Options / CSP).
+// Instead, we show product cards in the right panel and open links in new tabs.
+
+let displayedSources = [];
 
 function openInBrowser(url) {
-  const frame = document.getElementById('browserFrame');
+  // Open product URLs in a new tab (iframes are blocked by most sites)
+  if (url) window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+function showProductPanel(sources) {
   const welcome = document.getElementById('browserWelcome');
+  const cardsContainer = document.getElementById('productCards');
   const urlBar = document.getElementById('browserUrl');
-  const viewport = document.getElementById('browserViewport');
 
-  // Show loading
-  let loader = document.createElement('div');
-  loader.className = 'browser-loading';
-  loader.id = 'browserLoader';
-  loader.innerHTML = '<div class="browser-spinner"></div>';
-  viewport.appendChild(loader);
+  if (!sources || sources.length === 0) return;
 
-  // Hide welcome, show frame
+  displayedSources = sources;
+
+  // Hide welcome
   if (welcome) welcome.style.display = 'none';
-  frame.style.display = 'block';
-  frame.src = url;
-  urlBar.value = url;
 
-  // Track history
-  browserHistory = browserHistory.slice(0, browserHistoryIndex + 1);
-  browserHistory.push(url);
-  browserHistoryIndex = browserHistory.length - 1;
+  // Show cards
+  if (cardsContainer) {
+    cardsContainer.style.display = 'flex';
+    cardsContainer.innerHTML = '';
 
-  // Remove loader when loaded
-  frame.onload = () => {
-    const l = document.getElementById('browserLoader');
-    if (l) l.remove();
-  };
-  // Fallback remove after 5s
-  setTimeout(() => {
-    const l = document.getElementById('browserLoader');
-    if (l) l.remove();
-  }, 5000);
+    sources.forEach((src, i) => {
+      const price = src.price ? `৳${src.price}` : 'N/A';
+      const type = src.type || 'Audio';
+      const conn = src.connectivity || '';
+      const name = src.product_name || 'Unknown Product';
+      const url  = src.url || '#';
+
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.innerHTML = `
+        <div class="pc-header">
+          <span class="pc-badge">${type}</span>
+          ${conn ? `<span class="pc-badge pc-badge-conn">${conn}</span>` : ''}
+        </div>
+        <h4 class="pc-name">${name}</h4>
+        <div class="pc-price">${price}</div>
+        <a class="pc-link" href="${url}" target="_blank" rel="noopener noreferrer">
+          Visit Store →
+        </a>
+      `;
+      cardsContainer.appendChild(card);
+    });
+  }
+
+  // Update URL bar with first product
+  if (urlBar && sources[0]?.url) {
+    urlBar.value = sources[0].url;
+  }
 }
 
 function navigateBrowser(url) {
@@ -52,27 +70,10 @@ function navigateBrowser(url) {
   openInBrowser(url);
 }
 
-function browserBack() {
-  if (browserHistoryIndex > 0) {
-    browserHistoryIndex--;
-    const url = browserHistory[browserHistoryIndex];
-    document.getElementById('browserFrame').src = url;
-    document.getElementById('browserUrl').value = url;
-  }
-}
-
-function browserForward() {
-  if (browserHistoryIndex < browserHistory.length - 1) {
-    browserHistoryIndex++;
-    const url = browserHistory[browserHistoryIndex];
-    document.getElementById('browserFrame').src = url;
-    document.getElementById('browserUrl').value = url;
-  }
-}
-
+function browserBack() {}
+function browserForward() {}
 function browserReload() {
-  const frame = document.getElementById('browserFrame');
-  if (frame.src) frame.src = frame.src;
+  if (displayedSources.length > 0) showProductPanel(displayedSources);
 }
 
 // ===== TYPE CHIPS =====
@@ -254,9 +255,9 @@ async function sendMessage() {
     removeTyping();
     addMessage(data.reply, 'bot');
 
-    // If the response contains product URLs, auto-open the first one in the browser
-    if (data.sources && data.sources.length > 0 && data.sources[0].url) {
-      openInBrowser(data.sources[0].url);
+    // Show product cards in the right panel from RAG sources
+    if (data.sources && data.sources.length > 0) {
+      showProductPanel(data.sources);
     }
   } catch (err) {
     removeTyping();

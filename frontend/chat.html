@@ -132,7 +132,7 @@
 
         <!-- Right Pane: Embedded Browser -->
         <aside class="browser-pane">
-            <div class="browser-toolbar">
+            <!-- <div class="browser-toolbar">
                 <div class="browser-nav">
                     <button class="browser-btn" onclick="browserBack()" title="Back">←</button>
                     <button class="browser-btn" onclick="browserForward()" title="Forward">→</button>
@@ -144,15 +144,14 @@
                         placeholder="Click a product link in chat to open it here..."
                         onkeydown="if(event.key==='Enter')navigateBrowser(this.value)" />
                 </div>
-            </div>
+            </div> -->
             <div class="browser-viewport" id="browserViewport">
                 <div class="browser-welcome" id="browserWelcome">
-                    <div class="bw-icon">🌐</div>
-                    <h3>Embedded Browser</h3>
-                    <p>When a product link appears in the chat, click it to view the product page right here.</p>
+                    <div class="bw-icon">🛒</div>
+                    <h3>Product Results</h3>
+                    <p>Ask a question in the chat and matching products will appear here with store links.</p>
                 </div>
-                <iframe id="browserFrame" class="browser-frame"
-                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms" style="display:none;"></iframe>
+                <div class="product-cards" id="productCards" style="display:none;"></div>
             </div>
         </aside>
     </main>
