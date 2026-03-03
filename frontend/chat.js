@@ -39,7 +39,7 @@ function showProductPanel(sources) {
       const type = src.type || 'Audio';
       const conn = src.connectivity || '';
       const name = src.product_name || 'Unknown Product';
-      const url  = src.url || '#';
+      const url = src.url || '#';
 
       const card = document.createElement('div');
       card.className = 'product-card';
@@ -70,8 +70,8 @@ function navigateBrowser(url) {
   openInBrowser(url);
 }
 
-function browserBack() {}
-function browserForward() {}
+function browserBack() { }
+function browserForward() { }
 function browserReload() {
   if (displayedSources.length > 0) showProductPanel(displayedSources);
 }
@@ -170,21 +170,151 @@ function linkifyUrls(text) {
 }
 
 /**
- * Render markdown-like formatting from the LLM response:
- *  - **bold** → <strong>
- *  - Bullet lists (- or •)
- *  - URLs → clickable links that open in browser pane
+ * Render markdown formatting from LLM responses:
+ *  - Tables (| col1 | col2 | ...)
+ *  - **bold**
+ *  - ### headings
+ *  - Numbered lists (1. item)
+ *  - Bullet lists (- or • item)
+ *  - URLs → clickable links
+ *  - Horizontal rules (---)
  */
 function formatBotReply(text) {
-  // Bold
+  const lines = text.split('\n');
+  const htmlParts = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    // ── Table detection ──
+    // A table starts when we see a line that contains at least one |
+    // followed by a separator line like |---|---|
+    if (isTableRow(lines[i]) && i + 1 < lines.length && isTableSeparator(lines[i + 1])) {
+      const tableLines = [];
+      while (i < lines.length && isTableRow(lines[i])) {
+        tableLines.push(lines[i]);
+        i++;
+      }
+      htmlParts.push(renderTable(tableLines));
+      continue;
+    }
+
+    // ── Heading (### or ##) ──
+    const headingMatch = lines[i].match(/^(#{2,3})\s+(.+)/);
+    if (headingMatch) {
+      const level = headingMatch[1].length; // 2 or 3
+      const content = inlineFormat(headingMatch[2]);
+      htmlParts.push(`<h${level} class="chat-heading">${content}</h${level}>`);
+      i++;
+      continue;
+    }
+
+    // ── Horizontal rule ──
+    if (/^-{3,}$/.test(lines[i].trim()) || /^\*{3,}$/.test(lines[i].trim())) {
+      htmlParts.push('<hr class="chat-hr">');
+      i++;
+      continue;
+    }
+
+    // ── Numbered list ──
+    if (/^\d+\.\s+/.test(lines[i])) {
+      let listHtml = '<ol class="chat-ol">';
+      while (i < lines.length && /^\d+\.\s+/.test(lines[i])) {
+        const content = inlineFormat(lines[i].replace(/^\d+\.\s+/, ''));
+        listHtml += `<li>${content}</li>`;
+        i++;
+      }
+      listHtml += '</ol>';
+      htmlParts.push(listHtml);
+      continue;
+    }
+
+    // ── Bullet list ──
+    if (/^[\-•\*]\s+/.test(lines[i])) {
+      let listHtml = '<ul class="chat-ul">';
+      while (i < lines.length && /^[\-•\*]\s+/.test(lines[i])) {
+        const content = inlineFormat(lines[i].replace(/^[\-•\*]\s+/, ''));
+        listHtml += `<li>${content}</li>`;
+        i++;
+      }
+      listHtml += '</ul>';
+      htmlParts.push(listHtml);
+      continue;
+    }
+
+    // ── Empty line (paragraph break) ──
+    if (lines[i].trim() === '') {
+      htmlParts.push('<br>');
+      i++;
+      continue;
+    }
+
+    // ── Normal text line ──
+    htmlParts.push(inlineFormat(lines[i]));
+    // Add <br> if next line is also a plain text line (not a block element)
+    if (i + 1 < lines.length && lines[i + 1].trim() !== '' &&
+      !isTableRow(lines[i + 1]) && !/^#{2,3}\s/.test(lines[i + 1]) &&
+      !/^\d+\.\s/.test(lines[i + 1]) && !/^[\-•\*]\s/.test(lines[i + 1])) {
+      htmlParts.push('<br>');
+    }
+    i++;
+  }
+
+  return htmlParts.join('\n');
+}
+
+/** Apply inline formatting: bold, URLs */
+function inlineFormat(text) {
   let result = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  // Linkify URLs
   result = linkifyUrls(result);
-  // Simple bullet list formatting
-  result = result.replace(/^[\-•]\s+/gm, '&bull; ');
-  // Line breaks → <br>
-  result = result.replace(/\n/g, '<br>');
   return result;
+}
+
+/** Check if a line looks like a markdown table row */
+function isTableRow(line) {
+  if (!line) return false;
+  const trimmed = line.trim();
+  return trimmed.includes('|') && (trimmed.startsWith('|') || trimmed.endsWith('|'));
+}
+
+/** Check if a line is a table separator (|---|---|) */
+function isTableSeparator(line) {
+  if (!line) return false;
+  return /^\|?[\s\-:]+(\|[\s\-:]+)+\|?$/.test(line.trim());
+}
+
+/** Convert an array of markdown table lines into an HTML <table> */
+function renderTable(tableLines) {
+  // Filter out separator rows
+  const dataRows = tableLines.filter(line => !isTableSeparator(line));
+  if (dataRows.length === 0) return '';
+
+  const parseRow = (line) => {
+    return line.trim().replace(/^\|/, '').replace(/\|$/, '')
+      .split('|').map(cell => inlineFormat(cell.trim()));
+  };
+
+  let html = '<div class="chat-table-wrap"><table class="chat-table">';
+
+  // First data row = header
+  const headerCells = parseRow(dataRows[0]);
+  html += '<thead><tr>';
+  headerCells.forEach(cell => { html += `<th>${cell}</th>`; });
+  html += '</tr></thead>';
+
+  // Remaining rows = body
+  if (dataRows.length > 1) {
+    html += '<tbody>';
+    for (let r = 1; r < dataRows.length; r++) {
+      const cells = parseRow(dataRows[r]);
+      html += '<tr>';
+      cells.forEach(cell => { html += `<td>${cell}</td>`; });
+      html += '</tr>';
+    }
+    html += '</tbody>';
+  }
+
+  html += '</table></div>';
+  return html;
 }
 
 function addMessage(text, type) {

@@ -315,6 +315,105 @@
     border-top-right-radius: 4px;
 }
 
+/* ── Markdown elements inside chat messages ── */
+
+/* Tables */
+.msg-content .chat-table-wrap {
+    overflow-x: auto;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+}
+
+.msg-content .chat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .85rem;
+    table-layout: fixed;
+}
+
+.msg-content .chat-table th {
+    background: linear-gradient(135deg, rgba(124, 58, 237, .2), rgba(6, 182, 212, .12));
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 700;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--primary-light);
+    border-bottom: 2px solid var(--glass-border);
+    word-break: break-word;
+}
+
+.msg-content .chat-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, .05);
+    color: var(--text-secondary);
+    word-break: break-word;
+    white-space: normal;
+}
+
+.msg-content .chat-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, .02);
+}
+
+.msg-content .chat-table tbody tr:hover {
+    background: rgba(124, 58, 237, .06);
+}
+
+.msg-content .chat-table td strong,
+.msg-content .chat-table th strong {
+    color: var(--text);
+}
+
+/* Lists */
+.msg-content .chat-ul,
+.msg-content .chat-ol {
+    margin: 8px 0;
+    padding-left: 22px;
+}
+
+.msg-content .chat-ul li,
+.msg-content .chat-ol li {
+    margin-bottom: 5px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.msg-content .chat-ul li strong,
+.msg-content .chat-ol li strong {
+    color: var(--text);
+}
+
+.msg-content .chat-ul li::marker {
+    color: var(--primary-light);
+}
+
+.msg-content .chat-ol li::marker {
+    color: var(--accent-light);
+    font-weight: 700;
+}
+
+/* Headings */
+.msg-content .chat-heading {
+    margin: 12px 0 6px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.msg-content h2.chat-heading {
+    font-size: 1.15rem;
+}
+
+/* Horizontal rule */
+.msg-content .chat-hr {
+    border: none;
+    height: 1px;
+    background: var(--glass-border);
+    margin: 12px 0;
+}
+
 .typing-indicator {
     display: flex;
     gap: 4px;
