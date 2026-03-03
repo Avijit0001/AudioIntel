@@ -150,10 +150,21 @@ function getActiveFilters() {
 // ===== CHAT RENDERING =====
 const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
 
+function cleanUrl(raw) {
+  // Strip trailing punctuation that isn't part of the actual URL
+  // Handles URLs wrapped in parens: (https://example.com) or markdown [text](url)
+  let url = raw;
+  // Remove trailing characters that are almost never part of a URL
+  url = url.replace(/[)\].,;:!?]+$/, '');
+  return url;
+}
+
 function linkifyUrls(text) {
-  return text.replace(urlRegex, (url) => {
+  return text.replace(urlRegex, (matched) => {
+    const url = cleanUrl(matched);
+    const trailing = matched.slice(url.length); // chars we stripped (e.g. ")")
     const short = url.length > 50 ? url.slice(0, 47) + '...' : url;
-    return `<a class="product-link" onclick="event.preventDefault();openInBrowser('${url}')" href="#" title="Open in browser">${short}</a>`;
+    return `<a class="product-link" onclick="event.preventDefault();openInBrowser('${url}')" href="#" title="Open in browser">${short}</a>${trailing}`;
   });
 }
 

@@ -193,6 +193,8 @@
     display: flex;
     flex-direction: column;
     background: rgba(10, 10, 26, .5);
+    min-height: 0;
+    overflow: hidden;
 }
 
 .chat-messages {
