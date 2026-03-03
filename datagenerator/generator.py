@@ -25,11 +25,11 @@ import time
 import ollama
 
 # --------------------------------------------------------------------------- #
-# Config                                                                       #
+# Config                                                                      #
 # --------------------------------------------------------------------------- #
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
-INPUT_FILE  = os.path.join(BASE_DIR, "techland_neckband_products.json")
-OUTPUT_FILE = os.path.join(BASE_DIR, "techland_neckband_products_enriched.json")
+INPUT_FILE  = os.path.join(BASE_DIR, "techland_earbuds3.json")
+OUTPUT_FILE = os.path.join(BASE_DIR, "techland_earbuds3_enriched.json")
 
 MODEL = "qwen3:0.6b"   # change to any Ollama model that supports tool-calls
                      # e.g. "mistral", "qwen2.5", "llama3.1"
@@ -43,7 +43,7 @@ VALID_CONNECTIVITY = {"Wired", "Wireless"}
 VALID_USE_CASES    = {"Gaming", "General", "Music", "Studio", "Travel"}
 
 # --------------------------------------------------------------------------- #
-# Tool definition (JSON Schema)                                                #
+# Tool definition (JSON Schema)                                               #
 # --------------------------------------------------------------------------- #
 TOOLS = [
     {
@@ -99,7 +99,7 @@ TOOLS = [
 ]
 
 # --------------------------------------------------------------------------- #
-# Core classifier                                                              #
+# Core classifier                                                             #
 # --------------------------------------------------------------------------- #
 def classify_product(product_name: str, description: str, price: str) -> dict | None:
     """
@@ -170,7 +170,7 @@ def classify_product(product_name: str, description: str, price: str) -> dict | 
 
 
 # --------------------------------------------------------------------------- #
-# Main enrichment pipeline                                                     #
+# Main enrichment pipeline                                                    #
 # --------------------------------------------------------------------------- #
 def enrich_json(input_path: str, output_path: str) -> None:
     """Read input JSON, classify each product, write enriched JSON."""
@@ -236,7 +236,7 @@ def enrich_json(input_path: str, output_path: str) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# Entry point                                                                  #
+# Entry point                                                                 #
 # --------------------------------------------------------------------------- #
 if __name__ == "__main__":
     # Optional CLI overrides:  python json_enricher.py [input.json] [output.json]
