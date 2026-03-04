@@ -102,15 +102,25 @@
         }
 
         /* Team */
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 24px;
+        .team-section-inner {
             max-width: 1000px;
             margin: 0 auto;
         }
 
+        .team-row {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .team-row:last-child {
+            margin-bottom: 0;
+        }
+
         .team-card {
+            width: 260px;
             padding: 32px 20px;
             border-radius: var(--radius);
             background: var(--glass);
@@ -121,36 +131,36 @@
         }
 
         .team-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-6px);
             border-color: var(--accent);
             box-shadow: 0 8px 24px var(--accent-glow);
         }
 
         .team-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+            width: 140px;
+            height: 140px;
+            border-radius: var(--radius);
             margin: 0 auto 16px;
+            padding: 3px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.4rem;
+            overflow: hidden;
+            transition: transform .35s ease;
         }
 
-        .team-avatar.a1 {
-            background: linear-gradient(135deg, var(--primary), var(--accent-dark));
+        .team-card:hover .team-avatar {
+            transform: scale(1.06);
         }
 
-        .team-avatar.a2 {
-            background: linear-gradient(135deg, var(--accent), #0891b2);
-        }
-
-        .team-avatar.a3 {
-            background: linear-gradient(135deg, var(--warm), #d97706);
-        }
-
-        .team-avatar.a4 {
-            background: linear-gradient(135deg, #ec4899, #be185d);
+        .team-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: calc(var(--radius) - 3px);
+            object-fit: cover;
+            display: block;
+            background: var(--bg-card);
         }
 
         .team-card h4 {
@@ -168,6 +178,18 @@
         .team-card p {
             color: var(--text-muted);
             font-size: .82rem;
+        }
+
+        @media(max-width:768px) {
+            .team-card {
+                width: 200px;
+                padding: 24px 14px;
+            }
+
+            .team-avatar {
+                width: 120px;
+                height: 120px;
+            }
         }
 
         /* Stats */
@@ -202,30 +224,60 @@
 
         /* Tech Stack */
         .tech-grid {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
-            flex-wrap: wrap;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
-        .tech-chip {
-            padding: 12px 24px;
-            border-radius: 40px;
+        .tech-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding: 28px 16px;
+            border-radius: var(--radius);
+            background: var(--glass);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            font-size: .9rem;
-            font-weight: 500;
-            transition: var(--transition);
+            transition: all .35s cubic-bezier(.4, 0, .2, 1);
+            cursor: default;
         }
 
-        .tech-chip:hover {
-            border-color: var(--primary);
+        .tech-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary-light);
+            box-shadow: 0 8px 32px var(--primary-glow);
+        }
+
+        .tech-card img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(124, 58, 237, .2));
+            transition: transform .3s ease;
+        }
+
+        .tech-card:hover img {
+            transform: scale(1.15);
+        }
+
+        /* Simple Icons come as black SVGs — invert to white for dark bg */
+        .tech-card img.si-icon {
+            filter: brightness(0) invert(1) drop-shadow(0 0 8px rgba(124, 58, 237, .2));
+        }
+
+        .tech-card span {
+            font-size: .85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-align: center;
+            letter-spacing: .02em;
+        }
+
+        .tech-card:hover span {
             color: var(--text);
-            background: rgba(124, 58, 237, .1);
-            transform: translateY(-2px);
         }
 
         /* Contact CTA */
@@ -267,6 +319,20 @@
 
             .stat-number {
                 font-size: 2rem;
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+            }
+
+            .tech-card {
+                padding: 20px 12px;
+            }
+
+            .tech-card img {
+                width: 36px;
+                height: 36px;
             }
         }
     </style>
@@ -327,40 +393,10 @@
     <section class="section">
         <h2 class="section-title fade-up">Our <span class="gradient">Story</span></h2>
         <div class="story-section fade-up delay-1">
-            <p>Audio Intel was born from a simple frustration: finding the right headphones shouldn't require hours of
-                research across dozens of review sites. We were a group of audiophiles and tech enthusiasts who spent
-                countless hours comparing specs, reading reviews, and testing headphones.</p>
-            <p>We realized that what most people need isn't another review site — it's a smart assistant that
-                understands their needs and gives the perfect recommendation in seconds. That's why we built Audio
-                Intel:
-                an AI-powered headphone recommendation engine that combines deep audio knowledge with cutting-edge
-                technology.</p>
-            <p>Today, Audio Intel has helped thousands of people discover headphones they love, from casual listeners to
-                professional musicians.</p>
-        </div>
-    </section>
-
-    <!-- Stats -->
-    <section class="section">
-        <h2 class="section-title fade-up">By the <span class="gradient">Numbers</span></h2>
-        <p class="section-subtitle fade-up delay-1">Growing every day with our community of audio enthusiasts</p>
-        <div class="stats-row fade-up delay-2">
-            <div class="stat-item">
-                <div class="stat-number">50K+</div>
-                <div class="stat-label">Happy Users</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">2,500+</div>
-                <div class="stat-label">Headphones Analyzed</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">98%</div>
-                <div class="stat-label">Satisfaction Rate</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">150+</div>
-                <div class="stat-label">Brands Covered</div>
-            </div>
+            <p>During our 4th year attachment, our team worked under the innovative environment of Braincraft. There, we were encouraged to move beyond theory and focus on solving real-world problems with dedication and teamwork.</p>
+            <p>Through observation and research, we realized that choosing a personal hearing device can often feel complex and confusing. Hearing is deeply personal, yet recommendations are usually technical rather than user-centered..</p>
+            <p>This inspired us to create AudioIntel — a smart system designed to provide personalized hearing device recommendations based on individual needs, lifestyle, and hearing conditions. Instead of overwhelming users with specifications, AudioIntel delivers intelligent and simplified suggestions.</p>
+            <p>Built with commitment and collaboration under the guidance of Braincraft, AudioIntel reflects our growth, problem-solving mindset, and dedication to meaningful technology.</p>
         </div>
     </section>
 
@@ -368,30 +404,60 @@
     <section class="section">
         <h2 class="section-title fade-up">Meet the <span class="gradient">Team</span></h2>
         <p class="section-subtitle fade-up delay-1">Passionate audiophiles and engineers behind Audio Intel</p>
-        <div class="team-grid">
-            <div class="team-card fade-up delay-1">
-                <div class="team-avatar a1">👨‍💻</div>
-                <h4>Alex Chen</h4>
-                <div class="role">Founder & CEO</div>
-                <p>Audiophile with 15+ years in audio engineering</p>
+        <div class="team-section-inner">
+            <!-- Row 1: 2 members -->
+            <div class="team-row fade-up delay-1">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <img src="images/bilashvaiimage.jpeg" alt="Team Member 1">
+                    </div>
+                    <h4>Abu Haider Siddiq</h4>
+                    <div class="role">Chief Advisor</div>
+                    <p>Solution Architect | Writer | Startup Investor | Contributor of Python, JavaScript, Linux community | Millionaire</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <img src="images/sunipunvaiiamge.jpeg" alt="Team Member 2">
+                    </div>
+                    <h4>Sunipun Talukder</h4>
+                    <div class="role">Tech Instructor</div>
+                    <p>AI & ML Engineer | Computer Vision, Deep Learning & Generative AI | Mathematics Background | Competitive Programmer</p>
+                </div>
             </div>
-            <div class="team-card fade-up delay-2">
-                <div class="team-avatar a2">👩‍🔬</div>
-                <h4>Sarah Kim</h4>
-                <div class="role">Head of AI</div>
-                <p>ML expert building recommendation algorithms</p>
-            </div>
-            <div class="team-card fade-up delay-3">
-                <div class="team-avatar a3">👨‍🎨</div>
-                <h4>Marcus Rivera</h4>
-                <div class="role">Lead Designer</div>
-                <p>UX designer creating intuitive audio experiences</p>
-            </div>
-            <div class="team-card fade-up delay-4">
-                <div class="team-avatar a4">👩‍🎧</div>
-                <h4>Yuki Tanaka</h4>
-                <div class="role">Audio Specialist</div>
-                <p>Professional sound engineer and reviewer</p>
+            <!-- Row 2: 4 members -->
+            <div class="team-row fade-up delay-2">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <img src="images/shailyimage.jpeg" alt="Shaily Baul">
+                    </div>
+                    <h4>Shaily Baul</h4>
+                    <div class="role">Database Expert</div>
+                    <p>Expert in Database Management and Data Analysis</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <img src="images/malihaimage.jpeg" alt="Sayeeda Tasnim Maliha">
+                    </div>
+                    <h4>Sayeeda Tasnim Maliha</h4>
+                    <div class="role">System Engineer</div>
+                    <p>Expert in System Engineering and Cloud Computing</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <img src="images/IshtiyakImage.jpeg" alt="Istiyak Ahammed Bappy">
+                    </div>
+                    <h4>Istiyak Ahammed Bappy</h4>
+                    <div class="role">Frontend Specialist</div>
+                    <p>Expert in Frontend and UI/UX Design and Development</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <img src="images/avijitImage.jpeg" alt="Avijit Paul">
+                    </div>
+                    <h4>Avijit Paul</h4>
+                    <div class="role">LLM and Backend Developer</div>
+                    <p>Enthusiast in AI and Open Source</p>
+                </div>
             </div>
         </div>
     </section>
@@ -399,14 +465,40 @@
     <!-- Tech -->
     <section class="section">
         <h2 class="section-title fade-up">Our <span class="gradient">Technology</span></h2>
-        <p class="section-subtitle fade-up delay-1">Built with modern tools for the best experience</p>
+        <p class="section-subtitle fade-up delay-1">Built with cutting-edge tools and frameworks</p>
         <div class="tech-grid fade-up delay-2">
-            <div class="tech-chip">🤖 Machine Learning</div>
-            <div class="tech-chip">📊 Acoustic Analysis</div>
-            <div class="tech-chip">💬 Natural Language AI</div>
-            <div class="tech-chip">🔍 Smart Filtering</div>
-            <div class="tech-chip">📱 Responsive Design</div>
-            <div class="tech-chip">⚡ Real-Time Data</div>
+            <div class="tech-card">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg" alt="HTML5">
+                <span>HTML5</span>
+            </div>
+            <div class="tech-card">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" alt="CSS3">
+                <span>CSS3</span>
+            </div>
+            <div class="tech-card">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" alt="JavaScript">
+                <span>JavaScript</span>
+            </div>
+            <div class="tech-card">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" alt="Python">
+                <span>Python</span>
+            </div>
+            <div class="tech-card">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg" alt="FastAPI">
+                <span>FastAPI</span>
+            </div>
+            <div class="tech-card">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/selenium/selenium-original.svg" alt="Selenium">
+                <span>Selenium</span>
+            </div>
+            <div class="tech-card">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg" alt="GitHub" class="si-icon">
+                <span>GitHub</span>
+            </div>
+            <div class="tech-card">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/supabase/supabase-original.svg" alt="Supabase">
+                <span>Supabase</span>
+            </div>
         </div>
     </section>
 
@@ -416,7 +508,7 @@
             <h2>Get in <span class="text-gradient">Touch</span></h2>
             <p>Have questions, feedback, or partnership inquiries? We'd love to hear from you.</p>
             <div class="contact-links">
-                <a href="mailto:hello@audioitel.com" class="btn btn-primary">📧 Email Us</a>
+                <a href="mailto:istiyakbappy@gmail.com" class="btn btn-primary">📧 Email Us</a>
                 <a href="chat.html" class="btn btn-outline">💬 Chat Now</a>
             </div>
         </div>

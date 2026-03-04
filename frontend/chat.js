@@ -115,11 +115,9 @@ function applyFilters() {
   const connect = activeConnect === 'all' ? '' : activeConnect;
   const budget = document.getElementById('budgetSlider').value;
   const useCase = document.getElementById('useCaseFilter').value;
-  const brand = document.getElementById('brandFilter').value;
   let msg = `I'm looking for ${connect ? connect + ' ' : ''}${type} headphones`;
   if (+budget < 500) msg += ` under $${budget}`;
   if (useCase !== 'general') msg += ` for ${useCase}`;
-  if (brand !== 'all') msg += ` from ${brand}`;
   sendQuick(msg);
 }
 
@@ -134,7 +132,6 @@ function resetFilters() {
   document.getElementById('budgetValue').textContent = '$500+';
   document.getElementById('budgetDisplay').innerHTML = 'Up to <strong>$500+</strong>';
   document.getElementById('useCaseFilter').value = 'general';
-  document.getElementById('brandFilter').value = 'all';
 }
 
 // ===== GATHER CURRENT FILTERS =====
@@ -144,7 +141,6 @@ function getActiveFilters() {
     connectivity: activeConnect,
     budget: parseInt(document.getElementById('budgetSlider').value, 10),
     use_case: document.getElementById('useCaseFilter').value,
-    brand: document.getElementById('brandFilter').value,
   };
 }
 

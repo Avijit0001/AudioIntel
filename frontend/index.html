@@ -205,49 +205,245 @@
       font-size: .95rem;
     }
 
-    /* ===== HOW IT WORKS ===== */
-    .steps {
-      display: flex;
-      gap: 32px;
-      max-width: 1000px;
+    /* ===== HOW IT WORKS — HORIZONTAL SLIDER ===== */
+    .how-it-works-wrapper {
+      max-width: 900px;
       margin: 0 auto;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .step {
-      flex: 1;
-      min-width: 220px;
-      text-align: center;
-      padding: 32px 20px;
       position: relative;
     }
 
-    .step-number {
-      width: 56px;
-      height: 56px;
+    /* --- Progress dots at top --- */
+    .slider-progress {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 48px;
+      position: relative;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      cursor: pointer;
+    }
+
+    .progress-dot {
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
+      background: var(--bg-card);
+      border: 2px solid var(--glass-border);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 1.3rem;
-      margin: 0 auto 20px;
-      box-shadow: 0 0 24px var(--primary-glow);
+      font-size: 1rem;
+      color: var(--text-muted);
+      transition: all .45s cubic-bezier(.4,0,.2,1);
     }
 
-    .step h3 {
-      font-size: 1.1rem;
-      margin-bottom: 8px;
+    .progress-step.active .progress-dot {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 0 28px var(--primary-glow), 0 0 8px var(--accent-glow);
+      transform: scale(1.15);
     }
 
-    .step p {
+    .progress-step.completed .progress-dot {
+      background: linear-gradient(135deg, var(--primary-dark), var(--accent-dark));
+      border-color: transparent;
+      color: var(--accent-light);
+    }
+
+    .progress-label {
+      margin-top: 10px;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: color .35s ease;
+      white-space: nowrap;
+    }
+
+    .progress-step.active .progress-label {
+      color: var(--primary-light);
+    }
+    .progress-step.completed .progress-label {
       color: var(--text-secondary);
-      font-size: .9rem;
     }
 
+    .progress-line {
+      flex: 1;
+      height: 3px;
+      background: var(--glass-border);
+      position: relative;
+      top: -12px;
+      z-index: 1;
+      border-radius: 3px;
+      overflow: hidden;
+    }
 
+    .progress-line .fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 3px;
+      transition: width .5s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .progress-line.filled .fill {
+      width: 100%;
+    }
+
+    /* --- Slide viewport --- */
+    .slides-viewport {
+      overflow: hidden;
+      border-radius: var(--radius);
+      position: relative;
+    }
+
+    .slides-track {
+      display: flex;
+      transition: transform .55s cubic-bezier(.4,0,.2,1);
+      will-change: transform;
+    }
+
+    .slide {
+      min-width: 100%;
+      padding: 48px 44px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      box-sizing: border-box;
+    }
+
+    .slide-icon-wrap {
+      flex-shrink: 0;
+      width: 110px;
+      height: 110px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      position: relative;
+    }
+
+    .slide-icon-wrap.purple {
+      background: linear-gradient(135deg, rgba(124,58,237,.25), rgba(124,58,237,.08));
+      border: 1px solid rgba(124,58,237,.3);
+      box-shadow: 0 0 40px rgba(124,58,237,.15);
+    }
+
+    .slide-icon-wrap.cyan {
+      background: linear-gradient(135deg, rgba(6,182,212,.25), rgba(6,182,212,.08));
+      border: 1px solid rgba(6,182,212,.3);
+      box-shadow: 0 0 40px rgba(6,182,212,.15);
+    }
+
+    .slide-icon-wrap.amber {
+      background: linear-gradient(135deg, rgba(245,158,11,.25), rgba(245,158,11,.08));
+      border: 1px solid rgba(245,158,11,.3);
+      box-shadow: 0 0 40px rgba(245,158,11,.15);
+    }
+
+    .slide-content {
+      flex: 1;
+    }
+
+    .slide-step-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 14px;
+    }
+
+    .slide-step-badge.purple { background: rgba(124,58,237,.2); color: var(--primary-light); }
+    .slide-step-badge.cyan   { background: rgba(6,182,212,.2);  color: var(--accent-light); }
+    .slide-step-badge.amber  { background: rgba(245,158,11,.2); color: var(--warm-light); }
+
+    .slide-content h3 {
+      font-size: 1.55rem;
+      margin-bottom: 10px;
+    }
+
+    .slide-content p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    /* --- Navigation arrows --- */
+    .slider-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .slider-arrow {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      color: var(--text);
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all .3s ease;
+    }
+
+    .slider-arrow:hover {
+      border-color: var(--primary-light);
+      background: rgba(124,58,237,.15);
+      box-shadow: 0 0 20px var(--primary-glow);
+      transform: scale(1.08);
+    }
+
+    .slider-arrow:disabled {
+      opacity: .3;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .slider-dots {
+      display: flex;
+      gap: 10px;
+    }
+
+    .slider-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--glass-border);
+      border: none;
+      cursor: pointer;
+      transition: all .35s ease;
+    }
+
+    .slider-dot.active {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: 0 0 12px var(--primary-glow);
+      transform: scale(1.3);
+    }
 
     /* ===== CTA SECTION ===== */
     .cta-section {
@@ -283,9 +479,27 @@
         font-size: 1rem;
       }
 
-      .steps {
+      .slide {
         flex-direction: column;
-        align-items: center;
+        padding: 32px 24px;
+        gap: 24px;
+        text-align: center;
+      }
+
+      .slide-icon-wrap {
+        width: 80px;
+        height: 80px;
+        font-size: 2.2rem;
+      }
+
+      .progress-label {
+        display: none;
+      }
+
+      .progress-dot {
+        width: 36px;
+        height: 36px;
+        font-size: .85rem;
       }
     }
   </style>
@@ -370,9 +584,8 @@
       </div>
       <div class="feature-card fade-up delay-2">
         <div class="feature-icon cyan">📊</div>
-        <h3>Expert Reviews</h3>
-        <p>Access in-depth reviews from audio professionals and real users to make informed decisions before you buy.
-        </p>
+        <h3>Personalized Recommendations</h3>
+        <p>Get recommendations tailored to your specific needs and preferences.</p>
       </div>
       <div class="feature-card fade-up delay-3">
         <div class="feature-icon amber">💰</div>
@@ -384,25 +597,71 @@
   </section>
 
   <!-- How It Works -->
-  <section class="section">
+  <section class="section" id="howItWorks">
     <h2 class="section-title fade-up">How It <span class="gradient">Works</span></h2>
     <p class="section-subtitle fade-up delay-1">Three simple steps to find your perfect headphones</p>
 
-    <div class="steps">
-      <div class="step fade-up delay-1">
-        <div class="step-number">1</div>
-        <h3>Create Account</h3>
-        <p>Sign up for free and tell us about your music preferences.</p>
+    <div class="how-it-works-wrapper fade-up delay-2">
+      <!-- Progress bar with numbered dots -->
+      <div class="slider-progress">
+        <div class="progress-step active" data-index="0">
+          <div class="progress-dot">1</div>
+          <span class="progress-label">Sign Up</span>
+        </div>
+        <div class="progress-line" id="progressLine1"><div class="fill"></div></div>
+        <div class="progress-step" data-index="1">
+          <div class="progress-dot">2</div>
+          <span class="progress-label">Chat</span>
+        </div>
+        <div class="progress-line" id="progressLine2"><div class="fill"></div></div>
+        <div class="progress-step" data-index="2">
+          <div class="progress-dot">3</div>
+          <span class="progress-label">Match</span>
+        </div>
       </div>
-      <div class="step fade-up delay-2">
-        <div class="step-number">2</div>
-        <h3>Chat With AI</h3>
-        <p>Describe what you're looking for and our AI will understand your needs.</p>
+
+      <!-- Slide viewport -->
+      <div class="slides-viewport">
+        <div class="slides-track" id="slidesTrack">
+          <!-- Slide 1 -->
+          <div class="slide">
+            <div class="slide-icon-wrap purple">📝</div>
+            <div class="slide-content">
+              <span class="slide-step-badge purple">Step 1</span>
+              <h3>Create Your Account</h3>
+              <p>Sign up for free in seconds. Tell us about your music taste, listening habits and what matters most to you in a pair of headphones.</p>
+            </div>
+          </div>
+          <!-- Slide 2 -->
+          <div class="slide">
+            <div class="slide-icon-wrap cyan">💬</div>
+            <div class="slide-content">
+              <span class="slide-step-badge cyan">Step 2</span>
+              <h3>Chat With Our AI</h3>
+              <p>Describe what you're looking for in natural language. Our intelligent assistant understands nuance — from bass response to wearing comfort.</p>
+            </div>
+          </div>
+          <!-- Slide 3 -->
+          <div class="slide">
+            <div class="slide-icon-wrap amber">🎯</div>
+            <div class="slide-content">
+              <span class="slide-step-badge amber">Step 3</span>
+              <h3>Get Matched</h3>
+              <p>Receive curated headphone recommendations with detailed comparisons, user reviews and the best prices — all tailored to you.</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="step fade-up delay-3">
-        <div class="step-number">3</div>
-        <h3>Get Matched</h3>
-        <p>Receive personalized headphone recommendations with detailed comparisons.</p>
+
+      <!-- Navigation -->
+      <div class="slider-nav">
+        <button class="slider-arrow" id="sliderPrev" aria-label="Previous step" disabled>‹</button>
+        <div class="slider-dots">
+          <button class="slider-dot active" data-slide="0" aria-label="Go to step 1"></button>
+          <button class="slider-dot" data-slide="1" aria-label="Go to step 2"></button>
+          <button class="slider-dot" data-slide="2" aria-label="Go to step 3"></button>
+        </div>
+        <button class="slider-arrow" id="sliderNext" aria-label="Next step">›</button>
       </div>
     </div>
   </section>
@@ -437,6 +696,87 @@
     if (track) {
       track.innerHTML += track.innerHTML;
     }
+
+    // ============ HOW-IT-WORKS SLIDER ============
+    (function () {
+      const slidesTrack = document.getElementById('slidesTrack');
+      const prevBtn = document.getElementById('sliderPrev');
+      const nextBtn = document.getElementById('sliderNext');
+      const dots = document.querySelectorAll('.slider-dot');
+      const progressSteps = document.querySelectorAll('.progress-step');
+      const progressLines = [document.getElementById('progressLine1'), document.getElementById('progressLine2')];
+      const totalSlides = 3;
+      let current = 0;
+
+      function goTo(index) {
+        if (index < 0 || index >= totalSlides) return;
+        current = index;
+        slidesTrack.style.transform = `translateX(-${current * 100}%)`;
+
+        // Update dots
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+
+        // Update progress steps
+        progressSteps.forEach((s, i) => {
+          s.classList.remove('active', 'completed');
+          if (i === current) s.classList.add('active');
+          else if (i < current) s.classList.add('completed');
+        });
+
+        // Update progress lines
+        progressLines.forEach((line, i) => {
+          if (line) line.classList.toggle('filled', i < current);
+        });
+
+        // Arrow states
+        prevBtn.disabled = current === 0;
+        nextBtn.disabled = current === totalSlides - 1;
+      }
+
+      prevBtn.addEventListener('click', () => goTo(current - 1));
+      nextBtn.addEventListener('click', () => goTo(current + 1));
+
+      dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.slide)));
+      progressSteps.forEach(s => s.addEventListener('click', () => goTo(+s.dataset.index)));
+
+      // Keyboard navigation when slider is in view
+      document.addEventListener('keydown', (e) => {
+        const section = document.getElementById('howItWorks');
+        if (!section) return;
+        const rect = section.getBoundingClientRect();
+        const inView = rect.top < window.innerHeight && rect.bottom > 0;
+        if (!inView) return;
+        if (e.key === 'ArrowLeft') goTo(current - 1);
+        if (e.key === 'ArrowRight') goTo(current + 1);
+      });
+
+      // Touch / swipe support
+      let touchStartX = 0;
+      const viewport = document.querySelector('.slides-viewport');
+      viewport.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+      viewport.addEventListener('touchend', (e) => {
+        const diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) {
+          diff > 0 ? goTo(current + 1) : goTo(current - 1);
+        }
+      });
+
+      // Auto-advance every 5 seconds
+      let autoTimer = setInterval(() => {
+        if (current < totalSlides - 1) goTo(current + 1);
+        else goTo(0);
+      }, 5000);
+
+      // Pause auto-advance on hover
+      const wrapper = document.querySelector('.how-it-works-wrapper');
+      wrapper.addEventListener('mouseenter', () => clearInterval(autoTimer));
+      wrapper.addEventListener('mouseleave', () => {
+        autoTimer = setInterval(() => {
+          if (current < totalSlides - 1) goTo(current + 1);
+          else goTo(0);
+        }, 5000);
+      });
+    })();
   </script>
 </body>
 
