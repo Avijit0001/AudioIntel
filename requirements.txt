@@ -1,0 +1,67 @@
+# ── Web Framework ──
+fastapi
+uvicorn[standard]
+python-multipart
+starlette
+pydantic
+pydantic-settings
+jinja2
+
+# ── Auth & Security ──
+python-jose[cryptography]
+passlib[bcrypt]
+
+# ── Supabase ──
+supabase
+postgrest
+gotrue
+psycopg2-binary
+
+# ── AI / LLM ──
+groq
+openai
+langchain
+langchain-community
+langchain-core
+langchain-openai
+langchain-ollama
+langchain-chroma
+langchain-text-splitters
+langgraph
+langgraph-checkpoint
+langgraph-prebuilt
+langsmith
+
+# ── Vector DB & Search ──
+chromadb
+rank-bm25
+
+# ── Scraping ──
+requests
+httpx
+beautifulsoup4
+lxml
+selenium
+playwright
+fake-useragent
+
+# ── Data ──
+pandas
+numpy
+pyarrow
+python-dateutil
+
+# ── Utilities ──
+python-dotenv
+loguru
+faker
+email-validator
+apscheduler
+
+# ── Dev / Testing ──
+pytest
+pytest-asyncio
+pytest-cov
+black
+isort
+flake8

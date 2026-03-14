@@ -1,0 +1,16 @@
+.venv
+.env
+# Main chroma database folder
+chroma_db/
+
+# If chroma folder name changes
+*/chroma_db/
+
+# Chroma database files (extra safety)
+chroma.sqlite3
+*.sqlite3
+*.bin
+*.pickle
+
+# Index & metadata
+index_metadata.pickle
